@@ -27,3 +27,14 @@
 
 ### LightningModule best practice
 - Pytorch Lightning release official detail [best practice style guide](https://pytorch-lightning.readthedocs.io/en/latest/starter/style_guide.html). e.g.) If you want to increase reusability and scalability, LightningModule shoule define system not model.
+
+
+### Where to write dev tools setting
+
+#### flake8
+- [Official docs is here](https://flake8.pycqa.org/en/latest/user/configuration.html#configuration-locations).
+- Setting should be written in one of `setup.cfg`, `tox.ini`, or `.flake8`.
+
+#### mypy
+- [Official docs is here](https://mypy.readthedocs.io/en/stable/config_file.html#the-mypy-configuration-file).
+- Serching order is `mypy.ini` > `pyproject.toml` > `setup.cfg`.

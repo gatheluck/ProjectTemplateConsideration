@@ -25,8 +25,8 @@
  the format file that defines the data needed to build the package proposed in PEP.
 
 
-### LightningModule best practice
-- Pytorch Lightning release official detail [best practice style guide](https://pytorch-lightning.readthedocs.io/en/latest/starter/style_guide.html). e.g.) If you want to increase reusability and scalability, LightningModule shoule define system not model.
+### LightningModule style guide
+- Pytorch Lightning release official detail [style guide](https://pytorch-lightning.readthedocs.io/en/latest/starter/style_guide.html).
 
 
 ### Where to write dev tools setting
@@ -38,3 +38,46 @@
 #### mypy
 - [Official docs is here](https://mypy.readthedocs.io/en/stable/config_file.html#the-mypy-configuration-file).
 - Serching order is `mypy.ini` > `pyproject.toml` > `setup.cfg`.
+
+### [PyTorch Lightning style guide](https://pytorch-lightning.readthedocs.io/en/stable/starter/style_guide.html)
+- To increase reusability and scalability, LightningModule shoule define system not model.
+```python
+class LitModel(LightningModule):
+    def __init__(self, encoder: nn.Module = None, decoder: nn.Module = None):
+        super().__init__()
+        self.encoder = encoder
+        self.decoder = decoder
+```
+
+- Method order should be like below.
+```python
+class LitModel(pl.LightningModule):
+
+    def __init__(...):
+
+    def forward(...):
+
+    def training_step(...):
+
+    def training_step_end(...):
+
+    def training_epoch_end(...):
+
+    def validation_step(...):
+
+    def validation_step_end(...):
+
+    def validation_epoch_end(...):
+
+    def test_step(...):
+
+    def test_step_end(...):
+
+    def test_epoch_end(...):
+
+    def configure_optimizers(...):
+
+    def any_extra_hook(...):
+```
+
+- If it is possible make `forward` and `training_step` independent. However when using DataParallel, you will need to call `forward` manually in side of `training_step`.

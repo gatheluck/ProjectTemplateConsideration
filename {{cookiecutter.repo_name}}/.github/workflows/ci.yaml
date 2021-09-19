@@ -1,0 +1,42 @@
+name: CI
+
+on: [pull_request]
+
+env:
+  DOCKER_COMPOSE_DIRECTORY: environments/continuous_integration
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v2
+    - run: pwd && docker-compose --version && docker --version
+
+    - run: docker-compose build --parallel {{cookiecutter.repo_name}}
+      working-directory: {% raw %}${{ env.DOCKER_COMPOSE_DIRECTORY }}{% endraw %}
+    - run: docker-compose up -d {{cookiecutter.repo_name}}
+      working-directory: {% raw %}${{ env.DOCKER_COMPOSE_DIRECTORY }}{% endraw %}
+
+    # pytest-cov export coverage data to a file
+    # However, the directory made by actions/checkout does not allow write
+    # chmod is needed to resolve above problem
+    - run: chmod 777 .
+      working-directory: src
+
+    - run: docker-compose exec -T {{cookiecutter.repo_name}} poetry install --no-interaction
+      working-directory: {% raw %}${{ env.DOCKER_COMPOSE_DIRECTORY }}{% endraw %}
+
+    - run: docker-compose exec -T {{cookiecutter.repo_name}} make black
+      working-directory: {% raw %}${{ env.DOCKER_COMPOSE_DIRECTORY }}{% endraw %}
+    - run: docker-compose exec -T {{cookiecutter.repo_name}} make flake8
+      working-directory: {% raw %}${{ env.DOCKER_COMPOSE_DIRECTORY }}{% endraw %}    
+    - run: docker-compose exec -T {{cookiecutter.repo_name}} make isort
+      working-directory: {% raw %}${{ env.DOCKER_COMPOSE_DIRECTORY }}{% endraw %}
+    - run: docker-compose exec -T {{cookiecutter.repo_name}} make mypy
+      working-directory: {% raw %}${{ env.DOCKER_COMPOSE_DIRECTORY }}{% endraw %}
+
+    - run: docker-compose exec -T {{cookiecutter.repo_name}} make test
+      working-directory: {% raw %}${{ env.DOCKER_COMPOSE_DIRECTORY }}{% endraw %}

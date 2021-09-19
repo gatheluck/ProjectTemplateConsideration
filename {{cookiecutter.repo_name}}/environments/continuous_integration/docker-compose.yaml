@@ -1,0 +1,19 @@
+version: "3.8"
+
+services: 
+  {{cookiecutter.repo_name}}:
+    container_name: {{cookiecutter.repo_name}}_continuous_integration
+    build: 
+      context: ../../
+      dockerfile: environments/development/Dockerfile
+      shm_size: 12G
+      args:
+        PYTHON_VERSION: {{cookiecutter.python_version}}
+        APPLICATION_DIRECTORY: /{{cookiecutter.repo_name}}
+    ports:
+      - 3001:3001
+    stdin_open: true
+    tty: true
+    user: 1000:1000
+    volumes:
+      - ../../../"{{cookiecutter.project_name.replace(' ', '')}}":/{{cookiecutter.repo_name}}
